@@ -14,25 +14,17 @@ class FavoritesViewController: UITableViewController {
     
     lazy var fetchedhResultController: NSFetchedResultsController<NSFetchRequestResult> = {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: Movie.self))
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         let frc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataStack.sharedInstance.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         frc.delegate = self
         return frc
     }()
+    
     var listFavMovies:[Movie]?
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         self.title = "Favorite Movies"
-        /*
-         if let photoinData = result.value(forKey: "photo") as? NSData{imageView.image = UIImage(data: photoinData);}
- */
-        
         updateContent()
     }
 
@@ -45,16 +37,11 @@ class FavoritesViewController: UITableViewController {
     func updateContent(){
         do {
             try self.fetchedhResultController.performFetch()
-            //print("COUNT FETCHED FIRST: \(self.fetchedhResultController.sections![0].numberOfObjects)")
         } catch let error  {
             print("ERROR en updateContent: \(error)")
         }
         if let movies = fetchedhResultController.fetchedObjects as? [Movie]{
             listFavMovies = movies
-            //coger lso datos de las pelis t p¡meterlos en la variable listFavMovies
-            //self.data = dia.getData()
-            //self.images = dia.getImages()
-            //self.labelText = dia.date
         }
         if(listFavMovies?.count == 0){
             self.NoResultsView()
@@ -97,42 +84,6 @@ class FavoritesViewController: UITableViewController {
         cell.textLabel?.text = listFavMovies![indexPath.row].title
         return cell
     }
- 
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     
     // MARK: - Navigation
@@ -143,16 +94,15 @@ class FavoritesViewController: UITableViewController {
         // Pass the selected object to the new view controller.
         if(segue.identifier == "showDetail"){
             if let indexPath = self.tableView.indexPathForSelectedRow{
-                //let movie = moviesList[indexPath.row]
                 let movieData = (listFavMovies![indexPath.row] as Movie).getKeyedValues()
                 let movieDetail = MovieDetails(movie: movieData)
                 let destinationViewController = segue.destination as! MovieDetailTableViewController
                 destinationViewController.details = movieDetail
                 destinationViewController.favorites = false
-                let image = (listFavMovies![indexPath.row] as Movie).photo
-                let ImageView = UIImage(data: image! as Data)
-                destinationViewController.image = ImageView
-                
+                if let image = (listFavMovies![indexPath.row] as Movie).photo {
+                    let ImageView = UIImage(data: image as Data)
+                    destinationViewController.image = ImageView
+                }
                 
             }
         }
@@ -161,8 +111,6 @@ class FavoritesViewController: UITableViewController {
 }
 extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        // TODO -  que no entre con todos los cambios. Solo cuando se hayan añadido cosas
-        print(type)
         switch type {
         case .insert:
             print("Entra en insert")
@@ -173,15 +121,9 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
         default:
             print("default")
         }
-        //print("Entra en Did Change an object")
-        //setViewControllers([viewControllerAtIndex(index: indexPath!)], direction: nil, animated: false, completion: nil)
-        //updateContent()
-        print("Entra en DidChangeelement")
-        tableView.reloadData()
     }
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        //self.tableView.endUpdates()
-        print("Entra en DidChangeContent")
+
         updateContent()
         tableView.reloadData()
         tableView.endUpdates()

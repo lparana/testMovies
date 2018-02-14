@@ -8,29 +8,31 @@
 
 import UIKit
 import CoreData
-/*struct movieDetail{
-    var label:String
-    var value: Any
-}*/
+
 class MovieDetailTableViewController: UITableViewController {
 
-
+    //Mark: Properties
     @IBOutlet weak var favbutton: UIBarButtonItem!
     @IBOutlet weak var movieView: UIImageView!
+    
     var movieId:Int?
     var titleMovie:String?
     var favorites:Bool = true
-    var rightButtonFav:UIBarButtonItem?
-    var rightButtonDelete:UIBarButtonItem?
     var details:MovieDetails?
     var image: UIImage?
+    
+    private var rightButtonFav:UIBarButtonItem?
+    private var rightButtonDelete:UIBarButtonItem?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 100
+        
         rightButtonFav = UIBarButtonItem.init(image: UIImage(named:"emptyStar"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(markFavorite(_:)))
         rightButtonDelete = UIBarButtonItem.init(image: UIImage(named:"star"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(deleteFavorite(_:)))
         
@@ -39,13 +41,9 @@ class MovieDetailTableViewController: UITableViewController {
         }else{
             self.navigationItem.rightBarButtonItem = rightButtonFav
         }
-        if(image != nil){
-            movieView.image = image
-        }
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 100
-        if(details != nil)
-        {
+        
+        
+        if(details != nil){
             self.movieId = details?.id
             title = (details?.title.value as! String)
             self.configureView()
@@ -55,18 +53,16 @@ class MovieDetailTableViewController: UITableViewController {
         if(titleMovie != nil){
             title = titleMovie
         }
+       
+        
     }
-
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
     func configureView(){
-        
-        print(movieId)
-        print(UserDefaults.standard.array(forKey: "savedIds"))
         
         //set waiting symbol
         let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 70))
@@ -78,19 +74,20 @@ class MovieDetailTableViewController: UITableViewController {
         tableView.tableFooterView = view
         
         //Set corresponding right button
-        if UserDefaults.standard.array(forKey: "savedIds") != nil {
-            var previousId = (UserDefaults.standard.array(forKey: "savedIds") as! [Int])
-            
-            if(previousId.contains((movieId)!)){
+        self.navigationItem.rightBarButtonItem = rightButtonFav
+        if let savedIds = UserDefaultsManager.savedIds {
+            if(savedIds.contains((movieId)!)){
                 self.navigationItem.rightBarButtonItem = rightButtonDelete
-            }else{
-                self.navigationItem.rightBarButtonItem = rightButtonFav
             }
-        }else{
-            self.navigationItem.rightBarButtonItem = rightButtonFav
         }
+        
         //If has already the information
         if(details != nil){
+            if(image != nil){
+                movieView.image = image
+            }else{
+                self.tableView.tableHeaderView = nil
+            }
             self.tableView.reloadData()
             self.tableView.tableFooterView = nil
             return
@@ -99,13 +96,11 @@ class MovieDetailTableViewController: UITableViewController {
         Connection.sharedInstance.getMovieDetails(id: (movieId)!){(results:MovieDetails?, error:Error?) in
             guard error == nil else {self.alertView();return}
             self.tableView.tableFooterView = nil
-            //print(results)
             if results != nil{
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
                 self.details = results!
             }
             self.tableView.reloadData()
-            //imageView.image = UIImage(named:"placeholder_wide")
             self.setImage()
         }
        
@@ -117,17 +112,20 @@ class MovieDetailTableViewController: UITableViewController {
         let path = !(self.details?.backdrop_path.isEmpty)! ? self.details?.backdrop_path : self.details?.poster_path
         guard !(path?.isEmpty)! else {return}
         var url:URL?
-        if let basePath = UserDefaults.standard.string(forKey: "baseurl") {
+        
+        if let basePath = UserDefaultsManager.baseurl {
             url = URL(string:  basePath + "w780" + path!)
         }
         
         if let url = url {
             self.movieView.downloadedFrom(url: url)
+            self.image = movieView.image
         }
         else {
             self.tableView.tableHeaderView = nil
         }
     }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -155,13 +153,12 @@ class MovieDetailTableViewController: UITableViewController {
                     cell.labeltext.text  = "All publics"
                 }
             }else if(value.title == "Genres" || value.title == "Poduction Companies"){
-                print(value.value as! [String])
                 cell.labeltext.text  = (value.value as! [String]).joined(separator: ", ")
             }else if(value.title == "Homepage"){
                 cell.labeltext.textColor = UIColor.blue
-                cell.labeltext.text = value.value as! String
+                cell.labeltext.text = value.value as? String
             }else{
-                cell.labeltext.text  = value.value as! String
+                cell.labeltext.text  = value.value as? String
             }
         }
         return cell
@@ -170,41 +167,6 @@ class MovieDetailTableViewController: UITableViewController {
         return self.details?.dataset[section].title
     }
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-    
     private func alertView(){
         let alert = UIAlertController(title: "Communication Error", message: "", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { (alert) in
@@ -216,12 +178,9 @@ class MovieDetailTableViewController: UITableViewController {
         }))
         present(alert, animated: true)
     }
-    
-    
 
     @objc func markFavorite(_ sender: Any) {
-        print("Entra en Favorite")
-        
+
         let managedContext = CoreDataStack.sharedInstance.persistentContainer.viewContext
         let entity = NSEntityDescription.entity(forEntityName: "Movie", in: managedContext)!
         let data = Movie(entity: entity, insertInto: managedContext)
@@ -247,28 +206,24 @@ class MovieDetailTableViewController: UITableViewController {
         }catch{
             print("Error guardando la pelicula")
         }
-        if UserDefaults.standard.array(forKey: "savedIds") == nil{
-            UserDefaults.standard.set([details?.id], forKey: "savedIds")
+        if UserDefaultsManager.savedIds == nil{
+            UserDefaultsManager.savedIds = [(details?.id)!]
         }else{
-            var previousId = (UserDefaults.standard.array(forKey: "savedIds") as! [Int])
-            print(previousId)
+            var previousId = UserDefaultsManager.savedIds as! [Int]
             previousId.append((details?.id)!)
-            print(previousId)
-            UserDefaults.standard.set(previousId, forKey: "savedIds")
+            UserDefaultsManager.savedIds = previousId
         }
         self.navigationItem.rightBarButtonItem = rightButtonDelete
-        //Meterlo en la BD
     }
     
     
     
     
     @objc func deleteFavorite(_ sender: Any) {
-        print("Entra en delete")
+
         self.navigationItem.rightBarButtonItem = rightButtonFav
-        //Borrarlo de la BD
+        
         let managedContext = CoreDataStack.sharedInstance.persistentContainer.viewContext
-        let entity = NSEntityDescription.entity(forEntityName: "Movie", in: managedContext)!
         let fetchRequest = NSFetchRequest<Movie>(entityName: "Movie")
         fetchRequest.predicate = NSPredicate(format: "id == %@", "\((details?.id)!)")
         do {
@@ -278,19 +233,18 @@ class MovieDetailTableViewController: UITableViewController {
                 let object = results.first
                 managedContext.delete(object!)
             }
-        }catch let error as NSError{
+        }catch _ as NSError{
             print("Error al recuperar")
         }
         do{
             try managedContext.save()
-        }catch let error as NSError{
+        }catch _ as NSError{
             print("Error al borrar")
         }
-        var ids = UserDefaults.standard.array(forKey: "savedIds") as! [Int]
+        var ids = UserDefaultsManager.savedIds as! [Int]
         let posicion = ids.index(of: (details?.id)!)
         _ = ids.remove(at: posicion!)
-        UserDefaults.standard.set(ids, forKey: "savedIds")
-        
+        UserDefaultsManager.savedIds = ids
     }
     
     

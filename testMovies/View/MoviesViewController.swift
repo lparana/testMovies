@@ -43,12 +43,9 @@ class MoviesViewController: UITableViewController{
         view.addSubview(indicator)
         
         tableView.tableFooterView = view
-        
+        //Request Movies
         Connection.sharedInstance.getPopularMovies(page:(self.page)){(results:[MovieShortDesc],total_pages:Int, error:Error?) in
-            guard error == nil else {
-                print("Error en get popular movies")
-                self.alertView()
-                return}
+            guard error == nil else {self.alertView();return}
             
             self.page += 1
             self.total_pages = total_pages
@@ -71,10 +68,11 @@ class MoviesViewController: UITableViewController{
         }))
         present(alert, animated: true)
     }
+    
     private func NoResultsView() {
         let view = UIView(frame: CGRect(x: 0, y: 30, width: tableView.frame.size.width, height: 300))
         let label = UILabel(frame: view.frame.insetBy(dx: 10, dy: 10))
-        label.text = "You have not selected any movie as Favorite."
+        label.text = "Something went wrong and there are no movies to show."
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 30)
         label.minimumScaleFactor = 0.4
@@ -111,40 +109,6 @@ class MoviesViewController: UITableViewController{
 
         return cell
     }
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     
     // MARK: - Navigation
