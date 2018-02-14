@@ -43,7 +43,7 @@ class MovieDetailTableViewController: UITableViewController {
         if(details != nil)
         {
             self.movieId = details?.id
-            title = details?.title.value as! String
+            title = (details?.title.value as! String)
             self.configureView()
         }else if(movieId != nil){
             self.configureView()
@@ -151,6 +151,7 @@ class MovieDetailTableViewController: UITableViewController {
                     cell.labeltext.text  = "All publics"
                 }
             }else if(value.title == "Genres" || value.title == "Poduction Companies"){
+                print(value.value as! [String])
                 cell.labeltext.text  = (value.value as! [String]).joined(separator: ", ")
             }else if(value.title == "Homepage"){
                 cell.labeltext.textColor = UIColor.blue

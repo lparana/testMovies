@@ -43,15 +43,17 @@ class MovieDetails {
         adult = pairs(title: "Recommended Age", value: movie["adult"] as! Bool )
         release_date = pairs(title: "Release Date", value: movie["release_date"] as? String ?? "")
         var values:[String] = []
+        print(movie["genres"] )
         if let ids = movie["genres"] as? [[String:Any]] {
             for i in ids{
                 print((i as [String:Any])["name"])
                 values.append((i as [String:Any])["name"] as! String)
             }
-            genre = pairs(title: "Genres", value: values)
+            
         }else if let ids = movie["genres"] as? [String] {
             print(ids)
-            genre = pairs(title: "Genres", value: ids)
+            values = ids
+            
         }
         genre = pairs(title: "Genres", value: values)
         backdrop_path = movie["backdrop_path"] as? String ?? ""
@@ -63,8 +65,13 @@ class MovieDetails {
                 print((i as [String:Any])["name"])
                 values.append((i as [String:Any])["name"] as! String)
             }
+        }else if let ids = movie["production_companies"] as? [String] {
+            print(ids)
+            values = ids
+            
         }
         productionCompanies = pairs(title: "Poduction Companies", value: values)
+
         tagline = movie["tagline"] as? String ?? ""
         
         

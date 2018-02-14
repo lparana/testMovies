@@ -12,7 +12,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="0bg-SN-Xbo">
             <objects>
-                <tabBarController id="PmK-1b-zeu" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="maintabbar" id="PmK-1b-zeu" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="aJ7-tM-R9H">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -208,8 +208,8 @@
         </scene>
     </scenes>
     <resources>
-        <image name="movies" width="42" height="42"/>
-        <image name="star" width="42" height="42"/>
+        <image name="movies" width="34" height="34"/>
+        <image name="star" width="34" height="34"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="t1S-AS-LxH"/>

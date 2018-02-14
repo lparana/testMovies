@@ -33,17 +33,16 @@ extension Movie {
     func getKeyedValues() -> [String:Any]{
         return [
             "adult": adult,
-            "backdrop_path": backdrop_path,
-            "genres": genre,
-            "homepage": homepage,
+            "backdrop_path": backdrop_path!,
+            "genres": genre as! [String],
+            "homepage": homepage!,
             "id": Int(id),
-            "overview": overview,
-        //"photo": NSData,
-            "poster_path": poster_path,
-            "production_companies": productionCompanies,
-            "release_date": release_date,
-            "tagline": tagline,
-            "title": title
+            "overview": overview!,
+            "poster_path": poster_path!,
+            "production_companies": productionCompanies as! [String],
+            "release_date": release_date!,
+            "tagline": tagline!,
+            "title": title!
         ]
     }
 
