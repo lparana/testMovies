@@ -26,9 +26,18 @@ class Connection {
         var parameters = defaultParams
         //parameters["append_to_response"] = "images"
         parameters["page"] = page
-        Alamofire.request(url, method:.get ,parameters:parameters).responseJSON { (response) in
-            guard response != nil else {completion([],0,connectionError.EmtyResponse);return}
+        Alamofire.request(url, method:.get ,parameters:parameters).validate().responseJSON { (response) in
+            guard response != nil else {
+                completion([],0,connectionError.EmtyResponse);return}
             print(response)
+            print(response.result)
+            switch response.result{
+            case .failure(let error):
+                completion([],0,connectionError.EmtyResponse);return
+            case .success(_):
+                print("success")
+            }
+            print("No hay fallo")
             let object = response.result.value as! [String:Any]
             guard let results = object["results"] as? [AnyObject] else {completion([],0,connectionError.InvalidResponse);return}
             
@@ -52,9 +61,16 @@ class Connection {
         var parameters = defaultParams
         //parameters["append_to_response"] = "images"
         Alamofire.request(url, method:.get ,parameters:parameters).responseJSON { (response) in
-            guard response != nil else {completion(nil,connectionError.EmtyResponse);return}
+            guard response != nil else {
+                completion(nil,connectionError.EmtyResponse);return}
             
             print(response)
+            switch response.result{
+            case .failure(let error):
+                completion(nil,connectionError.EmtyResponse);return
+            case .success(_):
+                print("success")
+            }
             
             guard let object = response.result.value as? [String:Any] else {completion(nil,connectionError.InvalidResponse);return}
             //Crear Objeto de MovieDetailed
@@ -85,33 +101,6 @@ class Connection {
             
             UserDefaults.standard.set(path, forKey: "baseurl")
             completion(true)
-            
-        }
-    }
-    
-    
-    func getCast(id:Int, completion:@escaping([String], Error?) -> Void) {
-        
-        let url = moviedb+"\(id)/credits"
-        var parameters = defaultParams
-        Alamofire.request(url, method: .get, parameters: parameters).responseJSON {  (response) in
-            
-            guard response != nil else {
-                return
-            }
-            
-            let response = response.result.value as! [String : Any]
-            let results = response["cast"] as! [[String : Any]]
-            
-            var cast = [String]()
-            
-            for result in results {
-                if let name = result["name"] as? String {
-                    cast += [name]
-                }
-            }
-            
-            completion(cast, nil)
             
         }
     }

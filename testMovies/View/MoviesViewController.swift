@@ -21,7 +21,7 @@ class MoviesViewController: UITableViewController{
         
     }
     override func viewWillAppear(_ animated: Bool) {
-        title = "Movies"
+        title = "Popular Movies"
     }
 
     override func didReceiveMemoryWarning() {
@@ -44,30 +44,33 @@ class MoviesViewController: UITableViewController{
         
         tableView.tableFooterView = view
         
-        
-        
         Connection.sharedInstance.getPopularMovies(page:(self.page)){(results:[MovieShortDesc],total_pages:Int, error:Error?) in
-            guard error == nil else {return}
-            self.tableView.tableFooterView = nil
+            guard error == nil else {
+                print("Error en get popular movies")
+                self.alertView()
+                return}
+            
             self.page += 1
             self.total_pages = total_pages
-            
-            //insert new data
-            //let count = self.moviesList.count
-            //let newcount = results.count
+
             if self.moviesList.count == 0 {
                 self.NoResultsView()
             }
             self.moviesList += results
             self.tableView.reloadData()
         }
-        
     }
-    
-    func setupRefresh(){
-        
+
+    private func alertView(){
+        let alert = UIAlertController(title: "Communication Error", message: "", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { (alert) in
+            self.loadInformation(page: self.page)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: { (alert) in
+            self.tableView.tableFooterView = nil
+        }))
+        present(alert, animated: true)
     }
-    
     private func NoResultsView() {
         let view = UIView(frame: CGRect(x: 0, y: 30, width: tableView.frame.size.width, height: 300))
         let label = UILabel(frame: view.frame.insetBy(dx: 10, dy: 10))
@@ -107,22 +110,6 @@ class MoviesViewController: UITableViewController{
         }
 
         return cell
-    }
-    
-    private func showNoResultsView() {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 300))
-        let label = UILabel(frame: view.frame.insetBy(dx: 10, dy: 10))
-        //label.text = (self.searchQuery ?? "").isEmpty ? "No results!" : "Your query:\n'" + self.searchQuery! + "'\nreturned no results"
-        label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: 30)
-        label.minimumScaleFactor = 0.4
-        label.adjustsFontSizeToFitWidth = true
-        label.numberOfLines = 0
-        label.center = view.center
-        
-        view.addSubview(label)
-        
-        tableView.tableFooterView = view
     }
     /*
     // Override to support conditional editing of the table view.
