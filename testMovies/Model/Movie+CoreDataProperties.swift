@@ -23,7 +23,7 @@ extension Movie {
     @NSManaged public var homepage: String?
     @NSManaged public var id: Int64
     @NSManaged public var overview: String?
-    //@NSManaged public var photo: NSData?
+    @NSManaged public var photo: NSData?
     @NSManaged public var poster_path: String?
     @NSManaged public var productionCompanies: NSObject?
     @NSManaged public var release_date: String?

@@ -29,8 +29,8 @@ class Connection {
         Alamofire.request(url, method:.get ,parameters:parameters).validate().responseJSON { (response) in
             guard response != nil else {
                 completion([],0,connectionError.EmtyResponse);return}
-            print(response)
-            print(response.result)
+            //print(response)
+            //print(response.result)
             switch response.result{
             case .failure(let error):
                 completion([],0,connectionError.EmtyResponse);return
@@ -64,7 +64,7 @@ class Connection {
             guard response != nil else {
                 completion(nil,connectionError.EmtyResponse);return}
             
-            print(response)
+            //print(response)
             switch response.result{
             case .failure(let error):
                 completion(nil,connectionError.EmtyResponse);return

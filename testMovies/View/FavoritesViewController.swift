@@ -149,6 +149,9 @@ class FavoritesViewController: UITableViewController {
                 let destinationViewController = segue.destination as! MovieDetailTableViewController
                 destinationViewController.details = movieDetail
                 destinationViewController.favorites = false
+                let image = (listFavMovies![indexPath.row] as Movie).photo
+                let ImageView = UIImage(data: image! as Data)
+                destinationViewController.image = ImageView
                 
                 
             }

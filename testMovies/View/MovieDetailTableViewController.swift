@@ -23,6 +23,7 @@ class MovieDetailTableViewController: UITableViewController {
     var rightButtonFav:UIBarButtonItem?
     var rightButtonDelete:UIBarButtonItem?
     var details:MovieDetails?
+    var image: UIImage?
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -37,6 +38,9 @@ class MovieDetailTableViewController: UITableViewController {
             self.navigationItem.rightBarButtonItem = rightButtonDelete
         }else{
             self.navigationItem.rightBarButtonItem = rightButtonFav
+        }
+        if(image != nil){
+            movieView.image = image
         }
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 100
@@ -232,7 +236,12 @@ class MovieDetailTableViewController: UITableViewController {
         data.setValue(details?.tagline, forKey: "tagline")
         data.setValue(details?.productionCompanies.value, forKey: "productionCompanies")
         data.setValue(details?.genre.value, forKey: "genre")
-        
+        if(movieView != nil){
+            let image = movieView.image
+            let pngImage = UIImagePNGRepresentation(image!)
+            data.setValue(pngImage, forKey: "photo")
+            
+        }
         do{
             try managedContext.save()
         }catch{
