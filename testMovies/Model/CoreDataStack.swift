@@ -17,6 +17,7 @@ class CoreDataStack: NSObject{
     private override init() {}
     // MARK: - Core Data stack
     
+    
     lazy var persistentContainer: NSPersistentContainer = {
         /*
          The persistent container for the application. This implementation
@@ -44,6 +45,8 @@ class CoreDataStack: NSObject{
         })
         return container
     }()
+    
+    
     
     // MARK: - Core Data Saving support
     

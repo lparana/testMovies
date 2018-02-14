@@ -28,7 +28,7 @@ class FavoritesViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
-        
+        self.title = "Favorite Movies"
         /*
          if let photoinData = result.value(forKey: "photo") as? NSData{imageView.image = UIImage(data: photoinData);}
  */
@@ -57,7 +57,7 @@ class FavoritesViewController: UITableViewController {
             //self.labelText = dia.date
         }
         if(listFavMovies?.count == 0){
-            self.showNoResultsView()
+            self.NoResultsView()
         }
     }
     
@@ -74,7 +74,7 @@ class FavoritesViewController: UITableViewController {
     }
 
     
-    private func showNoResultsView() {
+    private func NoResultsView() {
         let view = UIView(frame: CGRect(x: 0, y: 30, width: tableView.frame.size.width, height: 300))
         let label = UILabel(frame: view.frame.insetBy(dx: 10, dy: 10))
         label.text = "You have not selected any movie as Favorite."
@@ -144,9 +144,13 @@ class FavoritesViewController: UITableViewController {
         if(segue.identifier == "showDetail"){
             if let indexPath = self.tableView.indexPathForSelectedRow{
                 //let movie = moviesList[indexPath.row]
+                let movieData = (listFavMovies![indexPath.row] as Movie).getKeyedValues()
+                let movieDetail = MovieDetails(movie: movieData)
                 let destinationViewController = segue.destination as! MovieDetailTableViewController
-                //destinationViewController.movie = movie
+                destinationViewController.details = movieDetail
                 destinationViewController.favorites = false
+                
+                
             }
         }
     }
@@ -156,11 +160,21 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         // TODO -  que no entre con todos los cambios. Solo cuando se hayan añadido cosas
         print(type)
-        
+        switch type {
+        case .insert:
+            print("Entra en insert")
+            self.tableView.insertRows(at: [newIndexPath!], with: .automatic)
+        case .delete:
+            print("Entra en delete")
+            self.tableView.deleteRows(at: [indexPath!], with: .automatic)
+        default:
+            print("default")
+        }
         //print("Entra en Did Change an object")
         //setViewControllers([viewControllerAtIndex(index: indexPath!)], direction: nil, animated: false, completion: nil)
         //updateContent()
-        //tableView.reloadData()
+        print("Entra en DidChangeelement")
+        tableView.reloadData()
     }
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         //self.tableView.endUpdates()

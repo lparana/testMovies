@@ -48,6 +48,10 @@ class MovieDetails {
                 print((i as [String:Any])["name"])
                 values.append((i as [String:Any])["name"] as! String)
             }
+            genre = pairs(title: "Genres", value: values)
+        }else if let ids = movie["genres"] as? [String] {
+            print(ids)
+            genre = pairs(title: "Genres", value: ids)
         }
         genre = pairs(title: "Genres", value: values)
         backdrop_path = movie["backdrop_path"] as? String ?? ""

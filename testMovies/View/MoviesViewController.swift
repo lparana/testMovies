@@ -11,16 +11,12 @@ class MoviesViewController: UITableViewController{
 
     
     private var moviesList = [MovieShortDesc]()
-    private var page = 0
+    private var page = 1
+    private var total_pages = 1000
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
         loadInformation(page:page)
         
     }
@@ -35,13 +31,34 @@ class MoviesViewController: UITableViewController{
 
     
     private func loadInformation(page:Int){
-        
+        if(self.page >= total_pages){
+            return
+        }
         //set waiting symbol
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 70))
+        let indicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        indicator.activityIndicatorViewStyle = .gray
+        indicator.center = view.center
+        indicator.startAnimating()
+        view.addSubview(indicator)
+        
+        tableView.tableFooterView = view
         
         
-        Connection.sharedInstance.getPopularMovies{(results:[MovieShortDesc],total_pages:Int, error:Error?) in
+        
+        Connection.sharedInstance.getPopularMovies(page:(self.page)){(results:[MovieShortDesc],total_pages:Int, error:Error?) in
             guard error == nil else {return}
-            self.moviesList = results
+            self.tableView.tableFooterView = nil
+            self.page += 1
+            self.total_pages = total_pages
+            
+            //insert new data
+            //let count = self.moviesList.count
+            //let newcount = results.count
+            if self.moviesList.count == 0 {
+                self.NoResultsView()
+            }
+            self.moviesList += results
             self.tableView.reloadData()
         }
         
@@ -51,7 +68,21 @@ class MoviesViewController: UITableViewController{
         
     }
     
-    
+    private func NoResultsView() {
+        let view = UIView(frame: CGRect(x: 0, y: 30, width: tableView.frame.size.width, height: 300))
+        let label = UILabel(frame: view.frame.insetBy(dx: 10, dy: 10))
+        label.text = "You have not selected any movie as Favorite."
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 30)
+        label.minimumScaleFactor = 0.4
+        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 0
+        label.center = view.center
+        
+        view.addSubview(label)
+        
+        tableView.tableFooterView = view
+    }
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -135,11 +166,14 @@ class MoviesViewController: UITableViewController{
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        
         if(segue.identifier == "showDetail"){
             if let indexPath = self.tableView.indexPathForSelectedRow{
+                tableView.cellForRow(at: indexPath)?.setSelected(false, animated: true)
                 let movie = moviesList[indexPath.row]
                 let destinationViewController = segue.destination as! MovieDetailTableViewController
-                destinationViewController.movie = movie
+                destinationViewController.movieId = movie.id
+                destinationViewController.titleMovie = movie.title
             }
         }
     }
