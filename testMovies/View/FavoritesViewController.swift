@@ -42,6 +42,7 @@ class FavoritesViewController: UITableViewController {
         }
         if let movies = fetchedhResultController.fetchedObjects as? [Movie]{
             listFavMovies = movies
+            self.tableView.tableFooterView = nil
         }
         if(listFavMovies?.count == 0){
             self.NoResultsView()
@@ -113,10 +114,8 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
-            print("Entra en insert")
             self.tableView.insertRows(at: [newIndexPath!], with: .automatic)
         case .delete:
-            print("Entra en delete")
             self.tableView.deleteRows(at: [indexPath!], with: .automatic)
         default:
             print("default")

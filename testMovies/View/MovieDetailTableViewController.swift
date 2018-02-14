@@ -229,7 +229,6 @@ class MovieDetailTableViewController: UITableViewController {
         do {
             let results = try managedContext.fetch(fetchRequest)
             if results.count != 0 {
-                print(results.count)
                 let object = results.first
                 managedContext.delete(object!)
             }
